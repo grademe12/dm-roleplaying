@@ -1,0 +1,6 @@
+{
+  "contract": "dm-send-v2",
+  "enabled": true,
+  "argv": ["/usr/bin/python3", "/opt/persona-controller/controller/slack_send.py", "/opt/persona-controller/controller/slack-send.json"],
+  "timeout_seconds": 30
+}

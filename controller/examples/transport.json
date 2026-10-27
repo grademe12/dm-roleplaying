@@ -1,0 +1,6 @@
+{
+  "contract": "dm-send-v1",
+  "enabled": false,
+  "argv": ["python3", "/absolute/path/ig_cli_adapter.py", "/absolute/path/ig-mapping.json"],
+  "timeout_seconds": 30
+}

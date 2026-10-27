@@ -1,0 +1,20 @@
+{
+  "description": "General conversation fragments, not a complete apply document. Replace facts with real stored simulated activity results; use current revision/times/targets and the existing conversation_review contract.",
+  "facts": [
+    {
+      "id": "example-viewing-opinion",
+      "source": "simulated",
+      "summary": "hobby:screen example series viewing result",
+      "details": {"point_keys": ["episode-5-opinion"], "opinion": "이야기 전개보다 인물의 선택이 더 궁금해졌다"}
+    }
+  ],
+  "conversation_updates": [
+    {"op": "register_material", "ref": "series", "canonical_key": "example:series", "subject_key": "series:example", "kind": "experience", "fact_ids": ["example-viewing-opinion"]},
+    {"op": "register_unit", "ref": "opinion", "material_id": "@series", "subject_key": "series:example", "kind": "statement", "facet_key": "episode-5-opinion", "scope_key": "episode-5", "summary": "새 회차를 본 뒤의 자기 감상", "fact_ids": ["example-viewing-opinion"], "point_keys": ["episode-5-opinion"]}
+  ],
+  "parts": ["나는 이야기 전개보다 인물의 선택이 더 궁금해졌어."],
+  "conversation_plan": {
+    "version": 1,
+    "units": [{"unit_id": "@opinion", "mode": "introduce", "spans": [{"part_index": 0, "excerpt": "나는 이야기 전개보다 인물의 선택이 더 궁금해졌어."}], "basis": {}}]
+  }
+}

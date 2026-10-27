@@ -1,0 +1,13 @@
+{
+  "mode": "shadow",
+  "reintroduction_ms": 7200000,
+  "same_material_ms": 86400000,
+  "search_enabled": false,
+  "search_tool_verified": false,
+  "search_daily_limit": 2,
+  "search_interval_ms": 21600000,
+  "search_limit_ms": 180000,
+  "search_max_materials": 3,
+  "material_fresh_ms": 86400000,
+  "developing_fresh_ms": 3600000
+}

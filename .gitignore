@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+.env*
+
+# Runtime state never belongs in the repository.
+*.db
+*.db-*
+*.sqlite3
+*.log
+*.lock
+automation-state/
+runtime/
+controller/tests/tmp*/

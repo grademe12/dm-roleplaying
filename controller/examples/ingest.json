@@ -1,0 +1,6 @@
+{
+  "read_ok": true,
+  "messages": [
+    {"id": "example-platform-message-1", "text": "오늘 뭐 하고 있어요?", "direction": "incoming", "observation": {"identity": "platform", "thread_id": "example-thread", "note": "예시이며 실제 메시지가 아님"}}
+  ]
+}
