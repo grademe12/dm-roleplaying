@@ -1,6 +1,6 @@
 # 토큰 사용량 실측 분석 (2026-10-21 ~ 10-29)
 
-> **Summary (EN).** Token usage of the live persona deployment, measured by aligning the model provider's per-call usage export with the controller's decision traces. Moving wake checks to a model-free timer and gate cut the idle cost from 10.4M to 0.38M tokens per hour (−96%). Normalised per DM reply, however, the marginal cost rose from 0.57M to 1.40M, because each reply now builds its own decision instead of riding an already-awake session. A first comparison reported "3.0M → 1.4M per decision"; that unit turned out to be per wake, and wakes held very different numbers of replies before and after the change, so it is kept below only as a corrected step. In a 55-hour run (506M tokens), 83% of the input bytes handed to the worker session were re-sends of the same documents within one wake.
+> **Summary (EN).** Token usage of the live persona deployment, measured by aligning the model provider's per-call usage export with the controller's decision traces. Moving wake checks to a model-free timer and gate cut the idle cost from 10.4M to 0.38M tokens per hour (−96%, measured directly over hours with no reply; the regression intercept moved 11.7M → 1.1M). Normalised per DM reply, however, the marginal cost rose from 0.57M to 1.40M, because each reply now builds its own decision instead of riding an already-awake session. A first comparison reported "3.0M → 1.4M per decision"; that unit turned out to be per wake, and wakes held very different numbers of replies before and after the change, so it is kept below only as a corrected step. In a 55-hour run (522.6M tokens), 83% of the input bytes handed to the worker session were re-sends of the same documents within one wake.
 
 이 문서는 운영 중인 인물 하나(유진)의 실제 토큰 사용량을 단계별로 나눈 기록이다. 수치와 건수만 적었고, 대화 본문이나 기억 내용은 들어 있지 않다.
 
@@ -19,6 +19,7 @@
 
 - **정규화 단위:** DM 답장 1건 = `dm` 경로로 저장에 성공한 판단 1건. 10/22~27 사이 이 값은 700건으로, 별도로 잰 답장 그룹 수 683개와 거의 일치했다.
 - 도중에 CSV 형식이 바뀌었다. 겹치는 기간(10/21~26)의 총량이 두 형식에서 0.1M 이내로 일치하는 것을 확인한 뒤, 새 형식을 옛 형식으로 변환해 썼다.
+- **집계 대상:** 이 문서의 모든 토큰은 해당 모델의 전체 호출이다. 옛 형식에서 나뉘던 자동화 호출과 기본 호출을 합친 값이다. 새 형식은 둘을 나누지 못해서, 변경 전후를 같은 기준으로 맞추려고 합계를 쓴다. 운영자가 직접 시킨 작업이나 `overlap`도 빼지 않았다.
 
 ## 1. 변경 전 기준선
 
@@ -49,27 +50,40 @@
 | 답장당 | 4.14M | 1.84M | 1.34M | **1.89M** |
 | 실패로 끝난 기상 | 4 | 15 | 12 | **0** |
 
-총량은 약 72% 줄었다. 하지만 그날 대화량이 훨씬 적었다(답장 280건 → 27건). 답장당으로 보면 사흘 평균 1.95M과 1.89M으로 거의 같다. 총량 감소만으로는 개선을 말할 수 없다.
+총량은 약 72% 줄었다. 하지만 그날 대화량이 훨씬 적었다(답장 280건 → 27건). 답장당으로 보면 사흘 합산 기준 1.95M(546.4M ÷ 280건)과 1.89M으로 거의 같다. 날짜별 답장당 값을 단순 평균하면 2.44M이다. 총량 감소만으로는 개선을 말할 수 없다.
 
 ### 2-2. 고정비와 답장당 비용 나누기
 
 대화량이 다른 구간끼리 비교하려고, 한 시간 단위로 `토큰 = 고정비 + 답장 수 × 답장당 비용`을 최소제곱으로 맞췄다.
 
-| 구간 | 시간 | 답장 | 대화 없는 시간의 시간당 토큰 | 답장당 추가 비용 | 대화 있는 시간의 답장당 |
-|---|---|---|---|---|---|
-| 변경 전 (10/22~24) | 72 | 647 | **10.4M** | 0.57M | 1.35M |
-| 변경 후, 기억 off·shadow (10/28 04:00 ~ 10/29 18:00) | 38 | 123 | **0.38M** | 1.40M | 1.70M |
+| 구간 | 시간 | 답장 | 실제 총량 | 고정비(절편)/시간 | 답장당 추가 비용 | 검산: 시간×절편 + 답장×기울기 |
+|---|---|---|---|---|---|---|
+| 변경 전 (10/22~24) | 72 | 647 | 1,213.8M | 11.73M | 0.57M | 1,213.6M |
+| 변경 후, 기억 off·shadow (10/28 04:00 ~ 10/29 18:00) | 38 | 123 | 214.0M | 1.09M | 1.40M | 213.6M |
 
-- **대화가 없을 때의 비용은 약 96% 줄었다.** 모델 없는 기상 타이머와 게이트의 효과다.
+절편은 다른 시간의 영향을 받으므로, 답장이 0건인 시간의 토큰을 직접 평균한 값을 함께 둔다.
+
+| 구간 | 답장 0건인 시간 | 그 시간들의 평균 토큰 | 답장이 있던 시간의 답장당 토큰 |
+|---|---|---|---|
+| 변경 전 | 33 / 72 | **10.41M** | 1.35M |
+| 변경 후 | 12 / 38 | **0.38M** | 1.70M |
+
+- **대화가 없을 때의 비용은 약 96% 줄었다**(직접 측정 10.41M → 0.38M, 절편 기준으로는 11.73M → 1.09M, −91%). 모델 없는 기상 타이머와 게이트의 효과다. 변경 후 0건 시간이 12시간뿐이라, 절편보다 직접 측정값을 주 근거로 쓴다.
+- 시간대 편향 확인: 변경 전 0건 시간은 낮(8~20시)에도 흩어져 있었지만, 변경 후 0건 시간은 거의 밤(1~7시)이다. 양쪽 모두 1~7시의 0건 시간만 비교해도 5.26M(19시간) → 0.22M(11시간), 약 −96%로 같다.
 - **답장 1건의 추가 비용은 오히려 늘었다.** 예전에는 이미 깨어 있는 세션이 연달아 오는 DM에 이어서 답했다. 지금은 답장마다 판단 하나를 새로 만들고, 입력도 그때마다 새로 받는다.
 
 ### 2-3. 정정 기록
 
 처음 비교에서는 "판단당 3.0M → 1.4M"이라고 적었다. 그런데 그때 "판단"으로 센 25/27/43/30은 실제로는 **기상 횟수**였다. 변경 전에는 기상 한 번이 답장 여러 개를 처리했고 변경 후에는 그렇지 않아서, 기상당 값은 같은 조건의 비교가 아니다. 답장당 단위로 다시 계산한 위 표로 대체한다.
 
+같은 정정에서 함께 바로잡은 것:
+- 1절 기준선은 이전 판에서 자동화 호출만 센 값(10/22 319M, 10/23 315M, 10/24 310M)이었다. 이번 판은 2-1과 같은 기준인 전체 호출(457.5M, 388.1M, 368.2M)로 맞췄다.
+- 3절 총량은 이전 판에서 506M이라고 적었지만 다시 계산되지 않았다. CSV 전체(7,998건)는 522.6M이고, 날짜별 합(182.1 + 195.7 + 144.8)과 같다.
+- 2-2의 고정비 칸에는 처음에 회귀 절편이 아니라 0건 시간의 직접 평균이 들어가 있어 검산이 맞지 않았다. 두 값을 나눠 적었다.
+
 ## 3. 55시간 연속 운영
 
-10/27 16:47 ~ 10/29 23:26, 호출 7,998건, **506M**.
+10/27 16:47 ~ 10/29 23:26, 호출 7,998건, **522.6M**.
 
 | 날짜 | 호출 | 토큰 |
 |---|---|---|
