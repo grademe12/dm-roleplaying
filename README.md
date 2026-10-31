@@ -93,6 +93,7 @@ python3 -m unittest discover -s tools -p 'test_*.py'
 - [CORE_RULES.md](controller/CORE_RULES.md) — 인물 공통 판단 원칙
 - [runbooks/](controller/runbooks) — 상황별(DM·생활·복구) 모델 지침
 - [design/](controller/design) — 인물 설정과 대화 규칙
+- [operations/](operations) — 운영 기록. [토큰 사용량 실측 분석](operations/token-usage-analysis.md)은 단계별 사용량과 정정 과정을 담았다
 
 ## 범위
 
