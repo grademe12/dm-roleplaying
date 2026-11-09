@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" width="640" height="380" role="img" aria-label="dm-roleplaying 구성도: 메신저 DM은 ingest로 들어와 SQLite 원장에 쌓이고, gate가 모델 호출 없이 지금 판단이 필요한지 정합니다. 모델은 현재 상태를 받아 결정 JSON을 돌려주고, apply가 이를 검증한 뒤 원장에 한 번에 반영합니다. dispatch가 발송 잠금과 결과 확인을 거쳐 메신저로 답장을 보냅니다.">
+<rect width="640" height="380" fill="#fff"></rect>
+<defs><pattern id="dmrp-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#f0f0f0" stroke-width="1"></path></pattern></defs>
+<rect width="640" height="380" fill="url(#dmrp-grid)"></rect>
+<rect x="150" y="20" width="330" height="300" fill="none" stroke="#8d8d8d" stroke-width="1"></rect>
+<path d="M120 84 H180" fill="none" stroke="#d1621f" stroke-width="4"></path>
+<path d="M300 108 V146" fill="none" stroke="#161616" stroke-width="1.5"></path>
+<path d="M300 206 V230" fill="none" stroke="#161616" stroke-width="1.5"></path>
+<path d="M430 176 H520" fill="none" stroke="#0f62fe" stroke-width="3" stroke-dasharray="8 5"></path>
+<path d="M570 200 V262 H430" fill="none" stroke="#0f62fe" stroke-width="3" stroke-dasharray="8 5"></path>
+<path d="M180 280 H120 V108" fill="none" stroke="#d1621f" stroke-width="4" stroke-dasharray="10 6"></path>
+<g font-family="-apple-system, BlinkMacSystemFont, Apple SD Gothic Neo, Pretendard Variable, Pretendard, sans-serif" font-size="13" fill="#161616">
+<text x="162" y="308" text-anchor="start" font-size="12" fill="#8d8d8d">컨트롤러 · Python 표준 라이브러리</text>
+<rect x="20" y="60" width="100" height="48" fill="#fff" stroke="#161616" stroke-width="1.5"></rect>
+<text x="70" y="79.5" text-anchor="middle" font-weight="600" font-size="13">메신저</text>
+<text x="70" y="98.5" text-anchor="middle" font-size="11" fill="#525252" font-family="IBM Plex Mono, monospace">Slack DM</text>
+<rect x="180" y="60" width="240" height="48" fill="#fff" stroke="#161616" stroke-width="1.5"></rect>
+<text x="300" y="79.5" text-anchor="middle" font-weight="600" font-size="13">ingest · gate</text>
+<text x="300" y="98.5" text-anchor="middle" font-size="12" fill="#525252">모델 없이 깨울지 판단</text>
+<rect x="180" y="146" width="250" height="60" fill="#161616"></rect>
+<text x="305" y="171.5" text-anchor="middle" font-weight="600" font-size="13" fill="#fff">SQLite 원장</text>
+<text x="305" y="190.5" text-anchor="middle" font-size="11" fill="#c6c6c6" font-family="IBM Plex Mono, monospace">store.py · revision</text>
+<rect x="180" y="230" width="250" height="64" fill="#fff" stroke="#161616" stroke-width="1.5"></rect>
+<text x="305" y="248" text-anchor="middle" font-weight="600" font-size="13">apply · dispatch</text>
+<text x="305" y="267" text-anchor="middle" font-size="12" fill="#525252">결정 검증 후 한 번에 반영</text>
+<text x="305" y="286" text-anchor="middle" font-size="12" fill="#525252">발송 잠금, 결과 4종</text>
+<rect x="520" y="140" width="100" height="60" fill="#fff" stroke="#161616" stroke-width="1.5"></rect>
+<text x="570" y="165.5" text-anchor="middle" font-weight="600" font-size="13">모델</text>
+<text x="570" y="184.5" text-anchor="middle" font-size="12" fill="#525252">외부 LLM</text>
+<text x="475" y="168" text-anchor="middle" font-size="11" fill="#0f62fe">상태</text>
+<text x="500" y="254" text-anchor="middle" font-size="11" fill="#0f62fe">결정 JSON</text>
+<text x="70" y="200" text-anchor="middle" font-size="11" fill="#d1621f">답장</text>
+</g>
+</svg>
